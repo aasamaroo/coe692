@@ -1,0 +1,295 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: borrowdb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rentdb
+spec:
+  selector:
+    app: rentdb
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rentdb
+spec:
+  selector:
+    matchLabels:
+      app: rentdb
+  template:
+    metadata:
+      labels:
+        app: rentdb
+    spec:
+      containers:
+        - name: borrowdb
+          image: d1ode/coe692:rentdb
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: storage
+              mountPath: /data/borrowdb
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: borrowdb-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rentcar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rentcar
+  template:
+    metadata:
+      labels:
+        app: rentcar
+    spec:
+      containers:
+        - name: rentcar
+          image: d1ode/coe692:rentservice
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_URL
+              value: borrowdb:3306
+            - name: kubeMQAddress
+              value: 10.24.14.133:50000
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: holddb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: holddb
+spec:
+  selector:
+    app: holddb
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: holddb
+spec:
+  selector:
+    matchLabels:
+      app: holddb
+  template:
+    metadata:
+      labels:
+        app: holddb
+    spec:
+      containers:
+        - name: holddb
+          image: d1ode/coe692:holddb
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: storage
+              mountPath: /data/holddb
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: holddb-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: holdbook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: holdcar
+  template:
+    metadata:
+      labels:
+        app: holdcar
+    spec:
+      containers:
+        - name: holdcar
+          image: d1ode/coe692:holdservice
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_URL
+              value: holddb:3306
+            - name: kubeMQAddress
+              value: 10.24.14.133:50000
+          imagePullPolicy: Always
+---
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: searchdb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: searchdb
+spec:
+  selector:
+    app: searchdb
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searchdb
+spec:
+  selector:
+    matchLabels:
+      app: searchdb
+  template:
+    metadata:
+      labels:
+        app: searchdb
+    spec:
+      containers:
+        - name: searchdb
+          image: d1ode/coe692:searchdb
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: storage
+              mountPath: /data/searchdb
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: searchdb-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searchcars
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: searchcars
+  template:
+    metadata:
+      labels:
+        app: searchcars
+    spec:
+      containers:
+        - name: searchcars
+          image: d1ode/coe692:searchservice
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_URL
+              value: searchdb:3306
+            - name: kubeMQAddress
+              value: 10.24.14.133:50000
+          imagePullPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: d1ode/coe692:frontendservice
+          ports:
+            - containerPort: 8080
+          env:
+            - name: searchService
+              value: searchbook:80
+
+            - name: holdService
+              value: holdbook:80
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rentcar
+spec:
+  selector:
+    app: rentcar
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: holdcar
+spec:
+  selector:
+    app: holdcar
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: searchcars
+spec:
+  selector:
+    app: searchcars
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer
