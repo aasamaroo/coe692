@@ -1,0 +1,7 @@
+ryerson/ca/lab3/Helper/ChatInfo.class
+ryerson/ca/lab3/Helper/UserInfo.class
+ryerson/ca/lab3/Persistence/User_CRUD.class
+ryerson/ca/lab3/Business/Login.class
+ryerson/ca/lab3/Business/AddChat.class
+ryerson/ca/lab3/Business/Register.class
+ryerson/ca/lab3/Persistence/Chat_CRUD.class
