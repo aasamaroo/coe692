@@ -1,0 +1,7 @@
+ryerson/ca/business/XMLParser.class
+ryerson/ca/business/Business.class
+ryerson/ca/frontend/FrontEnd.class
+ryerson/ca/frontend/Authenticate.class
+ryerson/ca/helper/Car.class
+ryerson/ca/helper/CarsXML.class
+ryerson/ca/helper/Manufacturer.class
