@@ -1,0 +1,6 @@
+ryerson/ca/holdcar/persistence/Car_Hold_CRUD.class
+ryerson/ca/holdcar/business/HoldBusiness.class
+ryerson/ca/holdcar/endpoint/HoldResource.class
+ryerson/ca/holdcar/helper/CarHold.class
+ryerson/ca/holdcar/business/Messaging.class
+ryerson/ca/holdcar/endpoint/ApplicationConfig.class
