@@ -1,0 +1,7 @@
+ryerson/ca/carsearch/helper/Manufacturer.class
+ryerson/ca/carsearch/persistence/Car_CRUD.class
+ryerson/ca/carsearch/business/CarSearchBusiness.class
+ryerson/ca/carsearch/helper/Car.class
+ryerson/ca/carsearch/helper/CarsXML.class
+ryerson/ca/carsearch/endpoint/ApplicationConfig.class
+ryerson/ca/carsearch/endpoint/CarSearchResource.class
